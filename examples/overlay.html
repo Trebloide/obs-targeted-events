@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="es"><meta charset="utf-8"><title>Prueba de eventos</title>
+<style>body{background:transparent;color:#9bbc0f;font:28px monospace}pre{white-space:pre-wrap}</style>
+<p>Eventos recibidos: <strong id="count">0</strong></p><pre id="data">Esperando…</pre>
+<script>
+let count = 0;
+window.addEventListener('avatar_evento', event => {
+  document.getElementById('count').textContent = ++count;
+  document.getElementById('data').textContent = JSON.stringify(event.detail, null, 2);
+});
+</script></html>

@@ -1,0 +1,9 @@
+{
+  "vendorName": "targeted-browser-events",
+  "requestType": "emit_event",
+  "requestData": {
+    "sourceName": "Avatar",
+    "eventName": "avatar_evento",
+    "eventData": {"accion": "saltar"}
+  }
+}
