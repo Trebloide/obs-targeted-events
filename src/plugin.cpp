@@ -4,6 +4,10 @@
 #include <obs-module.h>
 #include "obs-websocket-api.h"
 
+#if LIBOBS_API_VER != MAKE_SEMANTIC_VERSION(29, 1, 0)
+#error "Build with OBS 29.1.0 headers to preserve the minimum supported OBS version."
+#endif
+
 OBS_DECLARE_MODULE()
 
 static obs_websocket_vendor vendor;

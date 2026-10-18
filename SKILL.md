@@ -9,6 +9,20 @@ Generate reusable code in the project's language or client library. The DLL runs
 as an OBS plugin and exposes a vendor request through OBS WebSocket v5.
 The client uses that WebSocket connection rather than loading the DLL directly.
 
+## Compatibility
+
+Minimum runtime: **OBS Studio 29.1.0**, with obs-browser and obs-websocket 5.2 or
+later loaded. The provided DLL targets Windows x64 and declares the OBS 29.1.0
+module API. Use the current 0.1.1 build; the older build compiled against OBS
+32.2.2 has a higher binary minimum.
+
+OBS 29.1.0 is the first stable release that includes the per-source
+`javascript_event` procedure required by this plugin. OBS 29.0.x and earlier
+are outside this compatibility baseline.
+
+Loading, import resolution, and module exports have been checked with OBS 29.1.0
+and 32.2.2. Full browser event delivery still requires an OBS integration test.
+
 ## 1. Prepare the connection and target
 
 - Reuse the existing OBS WebSocket client when available.
@@ -204,8 +218,8 @@ and observed reception separately.
 
 ## References
 
-- Plugin contract: `src/plugin.c` and `LEEME.md` when the repository is available.
-  This skill describes `emit_event` in implementation 0.1.0; review those files
+- Plugin contract: `src/plugin.cpp` and `LEEME.md` when the repository is available.
+  This skill describes `emit_event` in implementation 0.1.1; review those files
   when using a version with API changes.
 - [obs-websocket-js client](https://github.com/obs-websocket-community-projects/obs-websocket-js): connection, authentication, and calls.
 - [Official OBS WebSocket v5 protocol](https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.md): envelopes and `CallVendorRequest`.

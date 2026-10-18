@@ -1,7 +1,7 @@
-# OBS Targeted Events — 0.1.0 experimental
+# OBS Targeted Events — 0.1.1 experimental
 
 Plugin nativo compilado en Windows x64, configuración Release, con MSVC 19.29
-(Visual Studio Build Tools 2019) y cabeceras oficiales de OBS 32.2.2.
+(Visual Studio Build Tools 2019) y cabeceras y biblioteca de importación de OBS 29.1.0.
 La DLL generada está en `package/obs-plugins/64bit/obs-targeted-events.dll`.
 La prueba de integración en OBS descrita abajo sigue pendiente antes de usarlo en directo.
 
@@ -9,9 +9,26 @@ Envía un evento DOM únicamente a la fuente de navegador indicada por su nombre
 No modifica obs-browser y no necesita servidor adicional. Usa el servidor WebSocket
 de OBS y su autenticación habitual. El evento se recibe en event.detail.
 
+## Compatibilidad mínima
+
+**OBS Studio 29.1.0 o posterior, Windows x64**, con obs-browser y obs-websocket
+5.2 o posterior cargados. OBS 29.1.0 ya incluye ambos componentes necesarios.
+La DLL declara la API 29.1.0; no requiere OBS 32.2 para cargarse.
+
+OBS 29.0.x y anteriores no incluyen el procedimiento por fuente `javascript_event`
+que usa este plugin. El cambio oficial está en:
+https://github.com/obsproject/obs-browser/commit/501f624e0eabe851358bcc34dca785bbf52ac1c9
+La revisión de obs-browser incluida en OBS 29.1.0 puede consultarse en:
+https://github.com/obsproject/obs-studio/tree/29.1.0/plugins/obs-browser
+
+Se han comprobado la carga de la DLL, sus imports y exports, y su versión de API
+contra los runtimes oficiales de OBS **29.1.0** y **32.2.2**, en procesos separados.
+Estas comprobaciones no inician OBS ni demuestran la entrega del evento al HTML;
+la prueba de aislamiento descrita abajo sigue pendiente.
+
 ## Compilar para Windows x64
 
-### Compilación automática para OBS 32.2.2 instalado
+### Compilación automática con mínimo OBS 29.1.0
 
 Ejecuta desde esta carpeta:
 
@@ -19,35 +36,40 @@ Ejecuta desde esta carpeta:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-windows.ps1
 ```
 
-El script detecta Visual Studio con herramientas C++ (2019 16.11 o posterior),
-descarga las fuentes oficiales de OBS 32.2.2 y el header de obs-websocket fijado
-al commit de esa versión, y verifica sus SHA-256. Prepara en `.deps` las cabeceras
-y una biblioteca de importación a partir de los exports del `obs.dll` instalado.
-El plugin enlaza con ese OBS; no es necesario compilar todo OBS ni instalar otro IDE.
-Este SDK local está preparado para este plugin C x64 y esta versión de OBS.
+Requiere CMake >=3.24 y Visual Studio con herramientas C++ (2019 16.11 o posterior).
+El script descarga las fuentes oficiales y el paquete portátil de OBS 29.1.0,
+usa el header oficial de obs-websocket 5.2 de esa versión y verifica sus SHA-256.
+Prepara en `.deps` las cabeceras y una biblioteca de importación a partir de los
+exports del `obs.dll` **de OBS 29.1.0**. Compila en C++17 porque ese header oficial
+usa características de ese estándar. No es necesario compilar todo OBS.
 
-Por defecto usa OBS en `C:\Program Files\obs-studio` y CMake en
-`C:\Program Files\CMake\bin\cmake.exe`. Se pueden ajustar con los parámetros
-`-OBSInstallDir` y `-CMakePath`. Solo la primera descarga requiere Internet.
+El paquete portátil queda aislado en `.deps`: no se instala ni se ejecuta, y
+no modifica tu instalación habitual de OBS. Esta puede ser 29.1 o una posterior;
+ni siquiera es necesario tener OBS instalado para compilar.
+
+Por defecto usa CMake en `C:\Program Files\CMake\bin\cmake.exe`, ajustable con
+`-CMakePath`. Opcionalmente, `-OBSInstallDir` permite seleccionar un paquete
+**29.1.0 x64** ya extraído para enlazar, evitando descargar el paquete portátil.
+No indica dónde instalar la DLL resultante. Solo la primera descarga requiere Internet.
 El resultado queda en `package/obs-plugins/64bit/obs-targeted-events.dll`.
 
 ### Compilación con un SDK externo
 
 Requisitos: Visual Studio con Desarrollo de escritorio con C++, CMake >=3.24,
-SDK/libobs de desarrollo x64 compatible con tu versión de OBS (headers, obs.lib y
+SDK/libobs de desarrollo x64 **29.1.0** (headers, obs.lib y
 libobsConfig.cmake), y el header oficial obs-websocket-api.h.
 La instalación normal de OBS por sí sola NO constituye un SDK de desarrollo.
 Si no dispones de SDK, hay que preparar/compilar libobs siguiendo las instrucciones
 de compilación de OBS para Windows: https://github.com/obsproject/obs-studio/wiki
 
-Descarga el header oficial de:
-https://github.com/obsproject/obs-websocket/blob/master/lib/obs-websocket-api.h
-Guárdalo en una carpeta vendor conservando su licencia.
+Usa el header oficial fijado en `vendor/obs-websocket-api.h`, conservando su
+licencia. CMake exige el SDK 29.1.0 exacto y el código comprueba su versión para
+evitar elevar el mínimo por accidente al compilar con un SDK reciente.
 
 Desde PowerShell en esta carpeta, ajusta la ruta del SDK:
 
 ```powershell
-cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH="C:/ruta/al/sdk-obs" -DOBS_WEBSOCKET_INCLUDE_DIR="$PWD/vendor"
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH="C:/ruta/al/sdk-obs-29.1.0" -DOBS_WEBSOCKET_INCLUDE_DIR="$PWD/vendor"
 cmake --build build --config Release
 cmake --install build --config Release --prefix "$PWD/package"
 ```
@@ -56,6 +78,20 @@ Cierra OBS. Copia package/obs-plugins/64bit/obs-targeted-events.dll a
 obs-plugins/64bit dentro de tu instalación de OBS (junto a los otros plugins).
 Reabre OBS y comprueba en el registro: [targeted-browser-events] Ready.
 Para desinstalar, cierra OBS y elimina únicamente obs-targeted-events.dll.
+Si tenías la DLL anterior compilada contra 32.2.2, sustitúyela por la nueva.
+
+### Comprobar la compatibilidad binaria
+
+Con Python de 64 bits, ejecuta cada comprobación en un proceso separado:
+
+```powershell
+python scripts/check-windows-compatibility.py .deps/obs-runtime-29.1.0 package/obs-plugins/64bit/obs-targeted-events.dll
+python scripts/check-windows-compatibility.py "C:\Program Files\obs-studio" package/obs-plugins/64bit/obs-targeted-events.dll
+```
+
+El script comprueba carga de dependencias, exports del módulo y API 29.1.0.
+La segunda orden prueba el OBS de la ruta indicada. No sustituye la prueba de
+entrega al navegador dentro de OBS.
 
 ## Enviar desde cualquier cliente OBS WebSocket v5
 
@@ -105,5 +141,5 @@ eventData admite un objeto JSON, máximo 64 KiB serializado.
 ## Fundamento y licencia
 
 Código propio: GPL-2.0-or-later. Header externo: licencia original del proyecto.
-API de WebSocket: https://github.com/obsproject/obs-websocket/blob/master/lib/obs-websocket-api.h
-Procedimiento javascript_event: https://github.com/obsproject/obs-browser/blob/master/obs-browser-source.cpp
+API de WebSocket: https://github.com/obsproject/obs-websocket/blob/6ef055a369249f6d7b008914fe2bc360c96f23dc/lib/obs-websocket-api.h
+Procedimiento javascript_event en OBS 29.1.0: https://github.com/obsproject/obs-browser/blob/594115a27d40f0916e55db97cb61f7c7130cbe28/obs-browser-source.cpp

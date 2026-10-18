@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.24)
-project(obs-targeted-events VERSION 0.1.0 LANGUAGES C)
-find_package(libobs CONFIG REQUIRED)
+project(obs-targeted-events VERSION 0.1.1 LANGUAGES CXX)
+# Build against the oldest supported ABI so the DLL also loads on newer OBS.
+find_package(libobs 29.1.0 EXACT CONFIG REQUIRED)
 set(OBS_WEBSOCKET_INCLUDE_DIR "" CACHE PATH "Directory containing official obs-websocket-api.h")
 if(NOT EXISTS "${OBS_WEBSOCKET_INCLUDE_DIR}/obs-websocket-api.h")
   message(FATAL_ERROR "Set OBS_WEBSOCKET_INCLUDE_DIR to the obs-websocket lib directory")
 endif()
-add_library(obs-targeted-events MODULE src/plugin.c)
-target_compile_features(obs-targeted-events PRIVATE c_std_11)
+add_library(obs-targeted-events MODULE src/plugin.cpp)
+# The official obs-websocket 5.2 header uses C++17 inline variables.
+target_compile_features(obs-targeted-events PRIVATE cxx_std_17)
 target_link_libraries(obs-targeted-events PRIVATE OBS::libobs)
 target_include_directories(obs-targeted-events PRIVATE "${OBS_WEBSOCKET_INCLUDE_DIR}")
 set_target_properties(obs-targeted-events PROPERTIES PREFIX "")

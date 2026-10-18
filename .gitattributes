@@ -1,0 +1,2 @@
+# Preserve the upstream header bytes so SHA-256 checks also pass on Windows clones.
+vendor/obs-websocket-api.h text eol=lf

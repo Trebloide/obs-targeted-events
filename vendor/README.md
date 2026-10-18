@@ -1,10 +1,14 @@
 # obs-websocket API
 
 `obs-websocket-api.h` is the unmodified official header from commit
-`1ef34bf48110c2a18184e50e41cd0b1a855e2147`, the obs-websocket submodule used by
-OBS Studio 32.2.2. Its copyright and GPL-2.0-or-later license notice are retained
+`6ef055a369249f6d7b008914fe2bc360c96f23dc`, the obs-websocket 5.2 submodule used by
+OBS Studio 29.1.0 (API version 2). Its copyright and GPL-2.0-or-later license notice are retained
 in the header.
 
-Source: https://github.com/obsproject/obs-websocket/blob/1ef34bf48110c2a18184e50e41cd0b1a855e2147/lib/obs-websocket-api.h
+This official header uses C++17 features; the plugin is compiled as C++17 without
+modifying the header. The vendor operations used by the plugin are also present
+in later obs-websocket releases.
 
-SHA-256: `c29e8e38ee66c36db79cae86217ab0f270aad39f97e82090809d087c281b7948`
+Source: https://github.com/obsproject/obs-websocket/blob/6ef055a369249f6d7b008914fe2bc360c96f23dc/lib/obs-websocket-api.h
+
+SHA-256: `1a0fc704a8b92be0bca16b06a9ce1bb497366839ddc59a26ec66943e6df638bb`
