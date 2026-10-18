@@ -3,6 +3,17 @@
 Native OBS plugin that sends a DOM event to one browser source selected by its
 exact name, using OBS WebSocket v5.
 
+## Reusable AI skill
+
+This repository includes an English-language [SKILL.md](SKILL.md) for AI coding
+assistants building integrations with OBS Targeted Events. It covers WebSocket
+connection and authentication, `emit_event` requests, HTML event listeners,
+payload limits, response handling, and troubleshooting.
+
+Provide the file to your coding assistant as reusable instructions when creating
+a client or overlay. It includes examples for both sending events and receiving
+their data through `event.detail` in the browser source's HTML.
+
 ## Compatibility
 
 - Minimum runtime: **OBS Studio 29.1.0**, with obs-browser and obs-websocket 5.2
