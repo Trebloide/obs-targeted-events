@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(obs-targeted-events VERSION 0.1.1 LANGUAGES CXX)
+project(obs-targeted-events VERSION 0.1.2 LANGUAGES CXX)
 # Build against the oldest supported ABI so the DLL also loads on newer OBS.
 find_package(libobs 29.1.0 EXACT CONFIG REQUIRED)
 set(OBS_WEBSOCKET_INCLUDE_DIR "" CACHE PATH "Directory containing official obs-websocket-api.h")

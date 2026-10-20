@@ -54,6 +54,13 @@ contain `[targeted-browser-events] Ready`.
 
 When upgrading from the previous build, replace its DLL with this one.
 
+### Shutdown fix in 0.1.2
+
+Version 0.1.2 fixes a crash when closing OBS after obs-websocket has already
+unloaded. The plugin no longer calls the destroyed WebSocket API during module
+unload; obs-websocket owns and clears its vendor registrations at shutdown.
+The minimum supported OBS version remains 29.1.0.
+
 ## Check binary compatibility
 
 With a 64-bit Python interpreter, run these in separate processes:

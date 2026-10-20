@@ -93,8 +93,11 @@ void obs_module_post_load(void)
 
 void obs_module_unload(void)
 {
-    if (registered)
-        obs_websocket_vendor_unregister_request(vendor, "emit_event");
+    // OBS may unload obs-websocket first. Its API proc handler and vendors
+    // have then already been destroyed, so even unregistering is unsafe.
+    // obs-websocket owns the registration and releases it during shutdown.
+    // Only clear our local state here; never call another module on unload.
     registered = false;
     vendor = NULL;
+    _ph = NULL;
 }

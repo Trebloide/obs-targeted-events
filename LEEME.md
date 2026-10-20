@@ -1,4 +1,9 @@
-# OBS Targeted Events — 0.1.1 experimental
+# OBS Targeted Events — 0.1.2 experimental
+
+La versión 0.1.2 corrige un fallo al cerrar OBS: el plugin intentaba cancelar su
+registro después de que obs-websocket destruyera su API. Ahora deja esa limpieza
+al propietario del registro, obs-websocket. El mínimo sigue siendo OBS 29.1.0.
+Con OBS cerrado, sustituye la DLL anterior por la nueva compilación.
 
 Plugin nativo compilado en Windows x64, configuración Release, con MSVC 19.29
 (Visual Studio Build Tools 2019) y cabeceras y biblioteca de importación de OBS 29.1.0.
